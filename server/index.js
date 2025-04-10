@@ -32,6 +32,10 @@ app.get('/health', (req, res) => {
   res.send('API is healthy!');
 });
 
+app.get('/', (req, res) => {
+  res.send('API is running...');
+});
+
 // Keep redirect route last
 app.use('/', redirectRoutes); // ✅ KEEP THIS LAST
 
