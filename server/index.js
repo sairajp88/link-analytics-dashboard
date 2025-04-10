@@ -9,6 +9,8 @@ const authRoutes = require('./routes/authRoutes');
 
 dotenv.config();
 const app = express();
+
+// ✅ Use Render's dynamic port
 const PORT = process.env.PORT || 5000;
 
 // Connect to DB before anything else
@@ -16,22 +18,24 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
 }));
 app.use(express.json());
 
 // API Routes
 app.use('/api/links', linkRoutes);
-
-// Health check route
-app.get('/', (req, res) => {
-  res.send('API is running...');
-});
-
 app.use('/api/auth', authRoutes);
 
+// Health check route
+app.get('/health', (req, res) => {
+  res.send('API is healthy!');
+});
+
+// Keep redirect route last
 app.use('/', redirectRoutes); // ✅ KEEP THIS LAST
 
-// Start server
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+// Start server after DB connection
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
