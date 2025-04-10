@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Container, Row, Col, Card, Table, Button, Alert, Spinner, Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import {
+  Container, Row, Col, Card, Table, Button, Alert, Spinner, Modal, OverlayTrigger, Tooltip,
+} from 'react-bootstrap';
 import { Line, Pie } from 'react-chartjs-2';
 import 'chart.js/auto';
 import QRCode from 'react-qr-code';
 import { fetchLinks, deleteLinkAsync } from '../redux/linksSlice';
 import { FaLink, FaMousePointer, FaCopy, FaQrcode, FaTrashAlt } from 'react-icons/fa';
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -34,7 +36,7 @@ const Dashboard = () => {
 
       for (const link of links) {
         try {
-          const res = await fetch(`http://localhost:5000/api/links/${link._id}/analytics`);
+          const res = await fetch(`${BASE_URL}/api/links/${link._id}/analytics`);
           const data = await res.json();
           map[link._id] = data.userAgents || [];
         } catch (err) {
@@ -201,9 +203,15 @@ const Dashboard = () => {
                     <td><span className="badge bg-info">{analyticsMap[link._id]?.length || 0}</span></td>
                     <td>{new Date(link.createdAt).toLocaleString()}</td>
                     <td>
-                      <OverlayTrigger overlay={<Tooltip>Copy URL</Tooltip>}><Button size="sm" variant="outline-primary" className="me-1" onClick={() => handleCopy(link.shortUrl)}><FaCopy /></Button></OverlayTrigger>
-                      <OverlayTrigger overlay={<Tooltip>Show QR</Tooltip>}><Button size="sm" variant="outline-secondary" className="me-1" onClick={() => handleShowQR(link.shortUrl)}><FaQrcode /></Button></OverlayTrigger>
-                      <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}><Button size="sm" variant="outline-danger" onClick={() => handleDelete(link._id)}><FaTrashAlt /></Button></OverlayTrigger>
+                      <OverlayTrigger overlay={<Tooltip>Copy URL</Tooltip>}>
+                        <Button size="sm" variant="outline-primary" className="me-1" onClick={() => handleCopy(link.shortUrl)}><FaCopy /></Button>
+                      </OverlayTrigger>
+                      <OverlayTrigger overlay={<Tooltip>Show QR</Tooltip>}>
+                        <Button size="sm" variant="outline-secondary" className="me-1" onClick={() => handleShowQR(link.shortUrl)}><FaQrcode /></Button>
+                      </OverlayTrigger>
+                      <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
+                        <Button size="sm" variant="outline-danger" onClick={() => handleDelete(link._id)}><FaTrashAlt /></Button>
+                      </OverlayTrigger>
                     </td>
                   </tr>
                 ))}
